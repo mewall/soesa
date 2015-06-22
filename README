@@ -1,0 +1,328 @@
+SOESA - Structure Optimization and Validation using Separations of Atoms
+
+	Source code, binaries and scripts: Copyright 1999 by 
+	Michael Wall and Rice University
+
+	Files relating to PDF interatomic distance data: Copyright 1999
+	by Shankar Subramaniam and the University of Illinois at
+	Urbana-Champaign.
+
+	Distribution and modification of the source code, binaries
+	and scripts in this package are governed
+	under the "Artistic License" (perl license) described in the
+	file LICENSE in the SOESA distribution.
+	
+	Distribution and modification of the data files (files relating
+	to PDF interatomic distance data) are governed under terms described in
+	the file LICENSE.PDFDATA in the SOESA distribution.  The license 
+	restricts redistribution of the data files and all derivatives to 
+	the copyright holders and official SOESAwebsites.
+
+	
+Author: Michael Wall
+Version 0.21; 
+
+This document was prepared by Michael Wall <mewall@lanl.gov> and was
+last updated January, 2000
+
+Overview
+
+Soesa is a program for use in evaluating and refining atomic models of
+protein structures.  The program calculates an estimated prior
+probability of the interatomic distances in the structure by reference
+to an interatomic distance probability density function (PDF) database
+compiled from known structures.  It also calculates derivatives with
+respect to atomic position vectors for use in molecular dynamics
+simulations and structure refinement.
+
+See the following article for a description of the application of
+soesa to crystallographic refinement:
+
+Michael E. Wall, Shankar Subramaniam, and George N. Phillips,
+Jr. Protein structure determination using a database of interatomic
+distance probabilities. 1999. Protein Science 12:2720-27.
+
+Disclaimer
+
+This version has proven to be useful in the hands of the developer.
+Good results are not guaranteed.  Even though tests have shown that
+soesa can be used to improve protein structures, keep in mind that the
+structure validation and optimization is always in reference to a
+database of know structures, not the correct structure.  Soesa merely tells
+you how much a protein structure resembles those in the database, and gives
+a suggested perturbation for making a structure more like those in the
+database.
+
+System requirements
+
+The program was initially developed under IRIX 6.2, and the initial
+distribution will support this platform.  It has also been
+successfully run under IRIX 6.5 and Digital Unix.  The system should have
+200MB RAM to avoid slow behavior due to excessive disk access.  The
+server mode does not yet work under linux, although the other modes
+should work fine with data files of opposite byte order (they are 4-byte
+floating point).
+
+Distribution 
+
+http://www.bioc.rice.edu/soesa
+
+Installation
+
+Source and binaries are distributed as soesa-<version>-<platform>.tar.gz. 
+Database files are distributed as soesa-<version>-dat-<platform>.tar.gz.
+
+1) Download the above files into the directory where you want the 
+root directory soesa-0.21/ to be (e.g. /usr/local).  
+
+2) Execute the following command from the UNIX shell:
+
+gzip -dc soesa-<platform>-<version>.tar.gz | tar xf -
+gzip -dc soesa-dat-<platform>-<version>.tar.gz | tar xf -
+
+3) In order to build new binaries, execute the following commands 
+from the UNIX shell:
+
+cd soesa-0.21/
+make
+
+Using SOESA
+
+SOESA can be used in either a command-line mode or a server mode.  In
+the command-line mode, instructions are given by "-[option (arg1)
+(arg2) ...]" directives on the unix shell command line.  In the
+server mode, SOESA is started with the appropriate command-line
+arguments, and listens for requests at a first-in, first-out (FIFO)
+named pipe file.  The latter mode is recommended for refinement
+implementations, as the program otherwise has to read in more than 150
+MB of data each time an energy calculation is performed.  A simple
+client program called "tellsoesa" is supplied to initiate energy
+calculations in server mode.
+
+Starting the server
+
+Soesa is run from the UNIX command line as:
+
+soesa [-option (arg1) (arg2) ...]
+
+Some currently supported options are:
+
+-datafile [filename] 	- Specify PDF data file
+-hashfile [filename] 	- Specify index into PDF data file
+-aacfg [filename]	- Specify amino acid configuration file for 
+			  interpreting data files
+-pdb [filename]	        - Specify name of input PDB file
+-out [filename]		- Specify name of output file
+-verbose		- Turn on verbose log information
+-mexc [{m list}] 	- List space-delimited residue separation numbers 
+			  which will not be included in calculating scores 
+-minc [{m list}] 	- List space-delimited residue separation numbers 
+			  to be explicitly included in calculating scores
+-escale [weight]	- Weight of the output values.  Default is scaling of 
+			  0.58 kcal/mol by analogy with Boltzmann 
+			  statistics.
+-servermode		- Start in the background in server mode
+-fifo [filename]	- Filename for the FIFO used to request actions
+-eval			- Output the PDF score by residue of the PDB file
+-TNTlong		- Output the PDF score in TNT long format
+-TNTshort		- Output the PDF score in TNT short format
+-xplor			- Output the PDF score in xplor format
+			  the segid of the PDB file indicates selection info
+
+Some scripts are provided for common options:
+
+seval.csh [pdb file] [out file] 
+
+	  Evaluate the pdb file.  
+	  Output in out is a list of residue #, score pairs 
+
+sserve.csh [pdb file] [out file] [fifo file]
+
+	   Used for refinement.
+	   Start the server.  
+	   Always read pdb from the named file (with path received via
+                FIFO).  
+	   Always output in the named file (with path received via FIFO).
+	   Use the named fifo file for message passing.
+
+Using Server Mode
+
+The program tellsoesa is a client that tells SOESA to perform a
+calculation, or possibly shut down.
+   
+It runs from the UNIX command line as:
+
+tellsoesa [options] [-cmd <request>]
+
+The following options are available:
+
+-fifo [filename]      Specify the filename of the FIFO that soesa is
+		      monitoring for requests.  If the PDF_HOME
+		      environment variable is defined, use it as a 
+		      prefix.  The default is "soesa.fifo"
+-home [path]	      Specify the path name where the PDB file is read
+		      (the filename must be that used for starting
+		      soesa), and where the output file is to be written.
+
+Five -cmd requests are possible in version 0.2:
+
+short:	    	Calculate the pdf score in TNT short format.
+long:		Calculate the pdf score in TNT long format.
+xplor:		Calculate the pdf score in a format that can be
+		recognized by a modified version of xplor 3.851.
+eval:		Calculate he pdf score by residue (structrure validation).
+shutdown:	Shut down the server nicely.  This is preferred, as
+                a stale FIFO can cause problems with, e.g. recursive
+         	copying under IRIX.
+
+In order to run tellsoesa, either the full path name plus filename of
+the FIFO should be given via -fifo or the environment variable
+PDF_HOME should be set to the path name where the FIFO can be found.
+
+When tellsoesa is run, it passes a message to SOESA through the FIFO
+(e.g. soesa.fifo), telling it what kind of calculation to do.  Soesa
+will then look in the directory path specified by -home for a PDB file
+with name specified by -pdb on the soesa command line.  It will
+perform the requested calculation and place the output in the same
+directory path, using the file name specified by -out on the soesa
+command line.
+
+Structure validation
+
+Please see Recommendations for advice about preparing the PDB file.
+
+The shell script seval.csh can be used for evaluation:
+
+#!/bin/csh -f
+setenv b /soesa_root/bin
+setenv d /soesa_root/dat
+$b/soesa -aacfg $d/aa.cfg -hashfile $d/pdf.hash -datafile $d/pdf.data \
+         -eval -pdb $1 -out $2
+
+Run it by 'csh seval.csh <input pdb> <output score by residue>'
+
+The output file will contain a list of residue number, PDF score pairs.
+
+X-PLOR refinement
+
+Please see Recommendations for advice about preparing the PDB file.
+
+The shell script sserve.csh can be used to start the server for refinement:
+
+#!/bin/csh -f
+setenv b soesa_root/bin
+setenv d soesa_root/dat
+nohup $b/soesa -aacfg $d/aa.cfg -hashfile $d/pdf.hash -datafile $d/pdf.data \
+         -servermode -verbose -fifo soesa.fifo -pdb user.pdb -out user.dat \
+         >& soesa.log &
+
+
+A modified version of X-PLOR 3.851 (see www.bioc.rice.edu/soesa/xplor) 
+has been created to handle energy inputs by external programs, 
+including soesa.  The USER energy flag must be turned on to use this 
+feature.  There is full support of the CONStraints INTERactions statement 
+with this energy.
+
+During an energy calculation, a file "user.pdb" will be written in the
+directory where X-PLOR was executed.  Then, X-PLOR will execute a
+script named "user.csh" in the same directory.  It will then wait
+until the script is finished executing.  Finally it will read the USER
+energy and position derivatives from the file user.dat.
+
+When the user.csh script is through executing, there should be a file
+user.dat available.  The file should have the total energy at the top,
+followed by space-separated X,Y, and Z partial derivatives of the
+energy for each atom in the PDB file on subsequent lines.
+
+Here is a sample user.csh script for use in X-PLOR refinement with a
+PDF energy:
+
+#!/bin/csh -f
+tellsoesa -fifo /soesa_startup_directory/soesa.fifo \
+	  -home /xplor_startup_directory/           \
+	  -cmd xplor
+
+A sample script user.csh is included with the soesa-xplor
+distribution, along with a sample startup script for soesa.
+
+
+***IMPORTANT***
+
+Please read the Recommendedations section for instructions on how to
+prepare a PDB file for use in soesa.
+
+The following rules are used to determine the number of peptide bonds
+separating an atom pair in XPLOR calculations:
+
+1) If the chain ID's are different, the connection is deemed to be
+   tertiary.  The segment ID's are *not* considered, as they are used
+   to pass information about interactions selection.
+2) Otherwise, the different in residue numbers is used to determine
+   the number 'm'.  If the difference is negative, there is no score
+   contribution from that pair (but there will be when they are
+   considered in reverse.
+
+See the web page www.bioc.rice.edu/soesa for updates about refinement and 
+validation strategies.  Support will also initially be provided for
+new users; contact soesa@bioc.rice.edu for questions.
+
+TNT refinement
+
+Please see Recommendations for advice about preparing the PDB file.
+
+The shell script sserve.csh can be used for TNT refinement (see XPLOR
+refinement above).
+
+This part is really experimental at the moment.  Still, sample scripts
+are provided for using soesa in TNT refinement.  Due to the multimodal
+nature of the PDF distributions, only the steepest descent method will
+be successful-at no point should TNT attempt to use any curvature
+information.  Significant minimization is possible, but a
+simulated-annealing algorithm for TNT will be required to escape local
+traps and achieve really good refinement.  Soesa should be run in
+-servermode.
+
+The required modifications to TNT scripts are (see sample scripts):
+
+1) Run the TNT program to_pdb to convert the .cor file to a PDB file.  
+Output should be changed to the filename specified by -pdb in the 
+soesa command line.
+2) Run the program tellsoesa, issuing -cmd long
+3) Include output specified by -out in the soesa command line in the call to 
+the shift program.
+
+***IMPORTANT***
+
+Please read the Recommendations section for instructions on how to
+prepare a PDB file for use in soesa.
+
+The following rules are used to determine the number of peptide bonds
+separating an atom pair in TNT calculations:
+
+1) If the chain ID's are different or the segment ID's are different,
+   the connection is deemed to be tertiary.
+2) Otherwise, the different in residue numbers is used to determine
+   the number 'm'.  If the difference is negative, there is no score
+   contribution from that pair (but there will be when they are
+   considered in reverse.
+
+
+Recommendations
+
+PDB files:
+
+The best way to prepare a PDB file is to number all atoms
+sequentially, and to ensure that there are at least five residues
+separating chains that are not connected.  This will avoid all
+confusion with the interpretation of segid's and chains.
+
+Bug reports/advice/feedback
+
+Soesa Development Team <soesa@bioc.rice.edu>.
+
+
+
+
+
+
+

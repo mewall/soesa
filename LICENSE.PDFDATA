@@ -1,0 +1,53 @@
+The following license applies to the data files (files relating
+	to PDF interatomic distance data) in the SOESA distribution.
+	Source, executable and script files are governed under terms 
+	described in the file LICENSE in the SOESA distribution.  
+
+
+Preamble
+
+The intent of this document is to state the conditions under which a
+Package may be obtained and modified, such that the Copyright Holder
+maintains control over the distribution of the package, while giving
+the users of the package the right to use the Package in a
+more-or-less customary fashion, plus the right to make reasonable
+modifications. This license restricts redistribution of the data files
+and all derivatives to the copyright holders and official SOESA
+websites.
+
+
+Definitions
+
+     "Package" refers to the collection of files distributed by the
+     Copyright Holder, and derivatives of that collection of files
+     created through textual modification. 
+
+     "Standard Version" refers to such a Package if it has not been
+     modified, or has been modified in accordance with the wishes
+     of the Copyright Holder as specified below. 
+
+     "Copyright Holder" is whoever is named in the copyright or
+     copyrights for the package. 
+
+     "You" is you, if you're thinking about copying or distributing this
+     Package. 
+
+   1.You may *not* give away or sell verbatim copies of the source form of
+     the Standard Version of this Package, unless prior arrangement is made
+     with the copyright holders.
+
+   2.You may modify your copy of this Package in any way, provided
+     that you do not distribute it to others.
+
+   3.Aggregation of this Package with a commercial distribution is not
+     permitted without prior arrangement with the copyright holders.
+
+   4.The name of the Copyright Holder may not be used to endorse or
+     promote products derived from this software without specific prior
+     written permission. 
+
+   5.THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY
+     EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+     WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+     MERCHANTIBILITY AND FITNESS FOR A PARTICULAR
+     PURPOSE. 

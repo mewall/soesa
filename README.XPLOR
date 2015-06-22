@@ -1,0 +1,69 @@
+All files Copyright 1999 by Michael Wall and Rice University
+
+These are files that the SOESA development team used to make SOESA work
+in conjunction with XPLOR 3.851:
+
+0usere-IRIX64-n32.o    - Object file with a functional USERE subroutine
+                            (the old one simply returns an error message)
+                            Source code will likely be available in the future
+                            after careful evaluation of legal implications. 
+calcuser.c             - C subroutine called by USERE to calculate energy
+addusere.csh           - Installation script
+user.csh               - To be placed in the xplor working directory
+                            for refinement using SOESA.
+
+LICENSE:
+
+calcuser.c, addusere.csh and user.csh are governed by the "Artistic License"
+(perl license) described in the file LICENSE in the SOESA distribution.
+
+0usere-IRIX64-n32.o is licensed freely for academic use only by the
+   SOESA Development Team (www.bioc.rice.edu/soesa). It may be modified
+   but may not be distributed by academic users.  Commercial possession,
+   use, modification and distribution of the contents of this file may only
+   be permitted via written agreement with the copyright holder.
+
+
+INSTALLATION:
+
+This will likely work under IRIX 6.X using -mips4 compiling in n32.
+It is not tested on other platforms, and may not work in 64-bit.
+
+First, save a backup copy of the current xplor executable (probably
+xplor.exe in the $OBJ directory).
+
+XPLOR environment variables need to be defined (new-sgi-ulogin.com)
+Object (.o) files from the installation must still be in $OBJ.
+
+First copy the object file 0usere-[platform]-[type].o to $OBJ dir.
+Then ensure that addusere.csh is executable via chmod +x addusere.csh
+Finally install from a csh/tcsh shell via ./addusere.csh
+
+USE:
+
+1) Place user.csh in the directory where soesa is to be run.
+2) chmod +x user.csh
+3) In the xplor script, turn on the USER energy flag and turn off the
+   VDW energy flag for atom pairs that are to interact via the database
+   potential. (FLAGS and CONStraints INTERactions)
+4) Start soesa in server mode, using, e.g. sserve.csh in the soesa distn.
+5) Check the soesa log for indication that soesa is ready to accept requests
+   ("Listening..." in the log file)
+6) xplor < [input script] > [output log]
+
+We plan to document strategies for refinement in the near future.
+
+Please see 
+   Michael E. Wall, Shankar Subramaniam, and George N. Phillips, Jr., 
+   Protein structure determination using a database of interatomic 
+   distance probabilities. 1999 Protein Science 12:2720-27. 
+
+Please to not hesitate to contact:
+
+ SOESA Development Team <soesa@bioc.rice.edu>
+
+with questions about refinement using soesa.
+
+
+
+
